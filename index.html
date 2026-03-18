@@ -3,240 +3,278 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>المساعد القرآني - النسخة المستقرة</title>
+        <title>المساعد القرآني الذكي - Hybrid Search 2026</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Amiri&family=Tajawal:wght@400;700&display=swap");
             body {
                 font-family: "Tajawal", sans-serif;
-                background-color: #f3f4f6;
+                background-color: #f8fafc;
             }
             .quran-text {
                 font-family: "Amiri", serif;
-                font-size: 1.7rem;
-                line-height: 3rem;
-                color: #111827;
+                font-size: 1.75rem;
+                line-height: 3.2rem;
+                color: #0f172a;
             }
             .card-local {
-                border-right: 5px solid #059669;
-            }
+                border-right: 6px solid #10b981;
+            } /* أخضر للبحث النصي */
             .card-ai {
-                border-right: 5px solid #2563eb;
+                border-right: 6px solid #3b82f6;
+            } /* أزرق للبحث الذكي */
+            mark {
+                background-color: #fef08a;
+                padding: 0 4px;
+                border-radius: 4px;
             }
         </style>
     </head>
-    <body class="p-4 md:p-10">
-        <div class="max-w-4xl mx-auto">
-            <header class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-gray-900 mb-2">
-                    الباحث القرآني الهجين
+    <body class="p-4 md:p-12">
+        <div class="max-w-5xl mx-auto">
+            <header class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-slate-900 mb-3">
+                    الباحث القرآني الذكي
                 </h1>
-                <p class="text-blue-600 font-medium">
-                    بحث نصي محلي + تحليل ذكي (Gemini 2026)
+                <p class="text-slate-500 text-lg">
+                    دمج البرمجة المنطقية مع قوة الذكاء الاصطناعي
                 </p>
             </header>
 
             <div
-                class="bg-white p-5 rounded-2xl shadow-sm mb-6 border border-gray-200"
+                class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8"
             >
-                <div class="flex flex-col md:flex-row gap-3">
-                    <input
-                        type="password"
-                        id="apiKey"
-                        class="flex-1 p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="أدخل مفتاح API هنا..."
-                    />
-                    <button
-                        onclick="saveKey()"
-                        class="bg-gray-800 text-white px-6 py-3 rounded-xl hover:bg-black transition"
+                <details class="group">
+                    <summary
+                        class="flex justify-between items-center cursor-pointer list-none font-bold text-slate-700"
                     >
-                        حفظ المفتاح
-                    </button>
-                </div>
-                <div id="keyNote" class="text-xs text-gray-400 mt-2">
-                    المفتاح يُحفظ في متصفحك فقط ولا يُرسل لأي خادم وسيط.
-                </div>
+                        <span>إعدادات مفتاح Gemini API</span>
+                        <span class="transition group-open:rotate-180">▼</span>
+                    </summary>
+                    <div class="mt-5 flex flex-col md:flex-row gap-3">
+                        <input
+                            type="password"
+                            id="apiKey"
+                            class="flex-1 p-3 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50"
+                            placeholder="أدخل مفتاحك (AIzaSy...)"
+                        />
+                        <button
+                            onclick="saveApiKey()"
+                            class="bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold hover:bg-black transition shadow-lg"
+                        >
+                            حفظ المفتاح
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-3">
+                        يتم تخزين المفتاح محلياً في متصفحك (LocalStorage) لضمان
+                        الخصوصية.
+                    </p>
+                </details>
             </div>
 
-            <div class="flex gap-2 mb-10">
+            <div class="flex flex-col md:flex-row gap-3 mb-12">
                 <input
                     type="text"
                     id="searchInput"
-                    class="flex-1 p-5 rounded-2xl border-none shadow-lg text-lg outline-none focus:ring-2 focus:ring-blue-600"
-                    placeholder="اكتب كلمة أو اسأل عن موضوع سياقي..."
+                    class="flex-[3] p-5 rounded-3xl border-none shadow-xl text-xl outline-none focus:ring-4 focus:ring-blue-100"
+                    placeholder="ابحث بكلمة، أو اطرح سؤالاً سياقياً (مثلاً: آيات تتحدث عن فضل العلم)..."
+                    onkeypress="if(event.key === 'Enter') startSearch()"
                 />
                 <button
-                    onclick="runPowerSearch()"
-                    id="mainBtn"
-                    class="bg-blue-600 text-white px-10 rounded-2xl font-bold hover:bg-blue-700 shadow-lg transition"
+                    onclick="startSearch()"
+                    id="searchBtn"
+                    class="flex-1 bg-blue-700 text-white px-10 py-5 rounded-3xl font-bold text-xl shadow-2xl hover:bg-blue-800 transition active:scale-95"
                 >
-                    بحث
+                    إطلاق البحث
                 </button>
             </div>
 
             <div id="loader" class="hidden text-center py-10">
                 <div
-                    class="inline-block animate-bounce bg-blue-600 p-2 px-4 text-white rounded-full text-sm"
+                    class="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-full shadow-md border border-slate-100"
                 >
-                    جاري التفكير برمجياً...
+                    <div
+                        class="w-4 h-4 bg-blue-600 rounded-full animate-ping"
+                    ></div>
+                    <span class="text-slate-600 font-medium"
+                        >جاري تحليل البيانات عبر Gemini...</span
+                    >
                 </div>
             </div>
 
-            <div id="resultsArea" class="space-y-6"></div>
+            <div id="resultsContainer" class="space-y-8"></div>
         </div>
 
         <script>
-            let quranJSON = [];
+            let quranData = [];
+            let totalCount = 0;
 
-            // تحميل البيانات عند فتح الصفحة
+            // 1. تشغيل عند تحميل الصفحة
             window.onload = async () => {
-                const saved = localStorage.getItem("gemini_key");
-                if (saved) document.getElementById("apiKey").value = saved;
+                const savedKey = localStorage.getItem("gemini_api_key");
+                if (savedKey)
+                    document.getElementById("apiKey").value = savedKey;
 
                 try {
-                    const res = await fetch("quran.json");
-                    quranJSON = await res.json();
-                    console.log("✅ تم تحميل المصحف محلياً");
-                } catch (e) {
-                    renderError(
-                        "فشل تحميل ملف quran.json. تأكد أنه في نفس المجلد.",
+                    const response = await fetch("quran.json");
+                    if (!response.ok) throw new Error("الملف غير موجود");
+                    quranData = await response.json();
+                    console.log("Quran DB Loaded Successfully.");
+                } catch (err) {
+                    renderErrorMessage(
+                        "خطأ: لم نتمكن من العثور على ملف quran.json بجانب السكربت.",
                     );
                 }
             };
 
-            function saveKey() {
-                localStorage.setItem(
-                    "gemini_key",
-                    document.getElementById("apiKey").value,
-                );
-                alert("تم الحفظ!");
+            // 2. حفظ المفتاح
+            function saveApiKey() {
+                const key = document.getElementById("apiKey").value.trim();
+                localStorage.setItem("gemini_api_key", key);
+                alert("تم حفظ المفتاح بنجاح!");
             }
 
-            async function runPowerSearch() {
+            // 3. الدالة الرئيسية للبحث
+            async function startSearch() {
                 const query = document
                     .getElementById("searchInput")
                     .value.trim();
-                const key = document.getElementById("apiKey").value;
-                const area = document.getElementById("resultsArea");
+                const apiKey = document.getElementById("apiKey").value.trim();
+                const container = document.getElementById("resultsContainer");
                 const loader = document.getElementById("loader");
 
                 if (!query) return;
-                area.innerHTML = "";
 
-                // 1. البحث المحلي (Literal Search)
-                const localHits = findInJson(query);
-                if (localHits.length > 0) {
+                // تهيئة الواجهة للبحث الجديد
+                container.innerHTML = "";
+                totalCount = 0;
+
+                // أ- البحث المحلي (السريع)
+                const localResults = searchLocally(query);
+                if (localResults.length > 0) {
+                    totalCount += localResults.length;
                     renderSection(
-                        "نتائج مطابقة للنص (محلي)",
-                        localHits,
+                        "نتائج مطابقة للنص (Local)",
+                        localResults,
                         "card-local",
                     );
                 }
 
-                // 2. البحث الذكي (Semantic Search)
-                if (key) {
+                // ب- البحث عبر الذكاء الاصطناعي (الدلالي)
+                if (apiKey) {
                     loader.classList.remove("hidden");
                     try {
-                        const aiHits = await askGemini(query, key);
-                        if (aiHits.length > 0) {
+                        const aiResults = await searchViaAI(query, apiKey);
+                        if (aiResults && aiResults.length > 0) {
+                            totalCount += aiResults.length;
                             renderSection(
-                                "نتائج تحليل المعنى (الذكاء الاصطناعي)",
-                                aiHits,
+                                "نتائج تحليل المعنى (AI Analytics)",
+                                aiResults,
                                 "card-ai",
                             );
                         }
-                    } catch (err) {
-                        renderError("تنبيه الـ AI: " + err.message);
+                    } catch (error) {
+                        renderErrorMessage("تنبيه من Gemini: " + error.message);
                     } finally {
                         loader.classList.add("hidden");
+                        displaySummary(query);
                     }
-                } else if (localHits.length === 0) {
-                    renderError(
-                        "لم نجد نتائج نصية. أدخل مفتاح API لتفعيل البحث بالمعنى.",
-                    );
+                } else {
+                    displaySummary(query);
+                    if (localResults.length === 0) {
+                        renderErrorMessage(
+                            "لم نجد نتائج نصية. يرجى إدخال مفتاح API لتفعيل البحث الذكي.",
+                        );
+                    }
                 }
             }
 
-            function findInJson(term) {
-                let results = [];
-                // بحث بسيط يتجاهل التشكيل قليلاً (يمكن تحسينه برمجياً لاحقاً)
-                quranJSON.forEach((s) => {
-                    s.verses.forEach((v) => {
-                        if (v.text.includes(term)) {
-                            results.push({ surah: s.id, ayah: v.id });
+            // 4. محرك البحث المحلي (Literal Matching)
+            function searchLocally(query) {
+                let matches = [];
+                quranData.forEach((surah) => {
+                    surah.verses.forEach((verse) => {
+                        if (verse.text.includes(query)) {
+                            matches.push({ surah: surah.id, ayah: verse.id });
                         }
                     });
                 });
-                return results.slice(0, 5);
+                return matches.slice(0, 8); // تحديد العدد لمنع الإطالة
             }
 
-            async function askGemini(promptQuery, key) {
-                // تحديث الرابط إلى v1 المستقر لعام 2026 لتجنب 404
-                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`;
+            // 5. محرك البحث الذكي (Semantic AI)
+            async function searchViaAI(query, key) {
+                // استخدام v1 المستقر مع الموديل المختار
+                const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
 
-                const payload = {
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: `ابحث في القرآن عن آيات تخص: "${promptQuery}". رد بمصفوفة JSON فقط: [{"surah": 1, "ayah": 1}]. لا تزد حرفاً واحداً.`,
-                                },
-                            ],
-                        },
-                    ],
-                    generationConfig: { temperature: 0.1 },
-                };
+                const prompt = `ابحث في القرآن عن آيات تتعلق بـ: "${query}". رد بمصفوفة JSON فقط: [{"surah": 1, "ayah": 1}]. لا تكتب أي نص إضافي إطلاقاً.`;
 
                 const response = await fetch(url, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.1 },
+                    }),
                 });
 
-                if (!response.ok) {
-                    if (response.status === 404)
-                        throw new Error(
-                            "الموديل غير موجود (404). تأكد من اسم الموديل أو الرابط.",
-                        );
-                    if (response.status === 429)
-                        throw new Error("ضغط عالي (429). حاول بعد دقيقة.");
-                    throw new Error("خطأ من الخادم: " + response.status);
-                }
+                if (!response.ok)
+                    throw new Error(
+                        `Status ${response.status}. تأكد من صلاحية المفتاح والرابط.`,
+                    );
 
                 const data = await response.json();
                 const rawText = data.candidates[0].content.parts[0].text;
-                const match = rawText.match(/\[.*\]/s);
-                return match ? JSON.parse(match[0]) : [];
+                const jsonPart = rawText.match(/\[.*\]/s);
+                return jsonPart ? JSON.parse(jsonPart[0]) : [];
             }
 
-            function renderSection(title, items, borderClass) {
-                const area = document.getElementById("resultsArea");
+            // 6. عرض ملخص البحث (عدد النتائج)
+            function displaySummary(query) {
+                const container = document.getElementById("resultsContainer");
+                const summaryDiv = document.createElement("div");
+                summaryDiv.className =
+                    "flex justify-between items-center p-4 bg-slate-100 rounded-2xl text-slate-600 text-sm border border-slate-200";
+                summaryDiv.innerHTML = `
+                <span>كلمة البحث: <strong class="text-slate-900">"${query}"</strong></span>
+                <span>إجمالي الآيات المستخرجة: <strong class="text-blue-700 text-lg">${totalCount}</strong></span>
+            `;
+                container.prepend(summaryDiv);
+            }
+
+            // 7. بناء الواجهة للنتائج
+            function renderSection(title, items, styleClass) {
+                const container = document.getElementById("resultsContainer");
                 const section = document.createElement("div");
-                section.innerHTML = `<h3 class="text-gray-400 font-bold mb-3 mt-6 text-sm">${title}</h3>`;
+                section.innerHTML = `<h3 class="text-slate-400 font-bold mb-4 mt-8 text-xs uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-current"></span> ${title}</h3>`;
 
                 items.forEach((item) => {
-                    const sData = quranJSON.find((s) => s.id === item.surah);
-                    if (sData) {
-                        const vData = sData.verses.find(
+                    const sInfo = quranData.find((s) => s.id === item.surah);
+                    if (sInfo) {
+                        const vInfo = sInfo.verses.find(
                             (v) => v.id === item.ayah,
                         );
-                        if (vData) {
+                        if (vInfo) {
                             const card = document.createElement("div");
-                            card.className = `bg-white p-6 rounded-2xl shadow-sm mb-4 ${borderClass}`;
+                            card.className = `bg-white p-8 rounded-3xl shadow-sm mb-5 transition-all hover:shadow-xl hover:-translate-y-1 border border-slate-100 ${styleClass}`;
                             card.innerHTML = `
-                            <div class="text-xs font-bold text-blue-600 mb-2">سورة ${sData.name} | آية ${vData.id}</div>
-                            <p class="quran-text text-right">${vData.text} ﴿${vData.id}﴾</p>
+                            <div class="flex justify-between items-center mb-6">
+                                <span class="bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-xs font-bold">سورة ${sInfo.name} | آية ${vInfo.id}</span>
+                                <button onclick="navigator.clipboard.writeText('${vInfo.text}')" class="text-slate-300 hover:text-blue-500 text-xs">نسخ النص</button>
+                            </div>
+                            <p class="quran-text text-right" dir="rtl">${vInfo.text} ﴿${vInfo.id}﴾</p>
                         `;
                             section.appendChild(card);
                         }
                     }
                 });
-                area.appendChild(section);
+                container.appendChild(section);
             }
 
-            function renderError(msg) {
-                const area = document.getElementById("resultsArea");
-                area.innerHTML += `<div class="p-4 bg-orange-50 text-orange-700 border border-orange-200 rounded-2xl text-center">${msg}</div>`;
+            function renderErrorMessage(msg) {
+                const container = document.getElementById("resultsContainer");
+                container.innerHTML += `<div class="p-6 bg-red-50 text-red-700 border-2 border-red-100 rounded-3xl text-center font-bold">${msg}</div>`;
             }
         </script>
     </body>
